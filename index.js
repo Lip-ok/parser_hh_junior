@@ -6,7 +6,7 @@ const cron = require("node-cron");
 const app = express();
 const PORT = 3000;
 const HH_API_URL = "https://api.hh.ru/vacancies";
-const FILE_PATH = "vacancies.txt";
+const FILE_PATH = "vacancies.json";
 
 async function fetchVacancies() {
     try {
@@ -16,7 +16,7 @@ async function fetchVacancies() {
                 text: "Front-end React",
                 experience: "between1And3",
                 area: "113", // Вся Россия
-                per_page: 20 // Количество вакансий на странице
+                per_page: 5 // Сохраняем только 5 вакансий
             },
             headers: {
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
@@ -25,22 +25,17 @@ async function fetchVacancies() {
             }
         });
 
-        if (!fs.existsSync(FILE_PATH)) {
-            fs.writeFileSync(FILE_PATH, "", "utf8");
-        }
-        
-        let vacancies = new Set(fs.readFileSync(FILE_PATH, "utf8").split("\n").filter(line => line.trim() !== "" && !line.startsWith("Последнее обновление:")));
+        const vacancies = data.items.map(vacancy => ({
+            url: vacancy.alternate_url,
+            title: vacancy.name,
+            salary: vacancy.salary ? `От ${vacancy.salary.from || "–"} -  До ${vacancy.salary.to || "–"} ${vacancy.salary.currency || ""}` : "Не указано",
+            skills: vacancy.key_skills ? vacancy.key_skills.slice(0, 4).map(skill => skill.name) : []
+        }));
 
-        data.items.forEach(vacancy => {
-            if (vacancy.alternate_url) {
-                vacancies.add(vacancy.alternate_url);
-            }
-        });
-
-        const timestamp = `Последнее обновление: ${new Date().toLocaleString("ru-RU", { timeZone: "Europe/Moscow" })}`;
-        fs.writeFileSync(FILE_PATH, `${timestamp}\n${Array.from(vacancies).join("\n")}`, "utf8");
-        console.log(timestamp);
-        console.log("Загружено вакансий:", vacancies.size);
+        const timestamp = new Date().toLocaleString("ru-RU", { timeZone: "Europe/Moscow" });
+        fs.writeFileSync(FILE_PATH, JSON.stringify({ timestamp, vacancies }, null, 2), "utf8");
+        console.log(`Последнее обновление: ${timestamp}`);
+        console.log("Загружено вакансий:", vacancies.length);
     } catch (error) {
         console.error("Ошибка при запросе к HH:", error.response ? error.response.data : error.message);
     }
@@ -57,15 +52,20 @@ app.get("/vacancies", (req, res) => {
             return res.status(404).json({ error: "Вакансии пока не найдены, попробуйте позже." });
         }
         
-        const data = fs.readFileSync(FILE_PATH, "utf8").split("\n");
-        const timestamp = data.shift();
+        const { timestamp, vacancies } = JSON.parse(fs.readFileSync(FILE_PATH, "utf8"));
         
         const html = `
             <html>
             <head><title>Вакансии</title></head>
             <body>
-                <h1>${timestamp}</h1>
-                ${data.map(vacancy => `<p><a href="${vacancy}" target="_blank">${vacancy}</a></p>`).join("\n")}
+                <h1>Последнее обновление: ${timestamp}</h1>
+                ${vacancies.map(vacancy => `
+                    <div>
+                        <p><a href="${vacancy.url}" target="_blank">${vacancy.title}</a></p>
+                        <p>Зарплата: ${vacancy.salary}</p>
+                        <p>Ключевые навыки: ${vacancy.skills.length > 0 ? vacancy.skills.join(", ") : "Не указаны"}</p>
+                    </div>
+                `).join("\n")}
             </body>
             </html>
         `;

@@ -1,0 +1,35 @@
+{
+  "timestamp": "25.02.2025, 11:35:36",
+  "vacancies": [
+    {
+      "url": "https://hh.ru/vacancy/116497904",
+      "title": "Junior frontend developer (React)",
+      "salary": "От 70000 -  До 100000 RUR",
+      "skills": []
+    },
+    {
+      "url": "https://hh.ru/vacancy/117670791",
+      "title": "Frontend-разработчик",
+      "salary": "От 1600 -  До 2000 USD",
+      "skills": []
+    },
+    {
+      "url": "https://hh.ru/vacancy/117449658",
+      "title": "Frontend Developer (React)",
+      "salary": "От – -  До 165000 RUR",
+      "skills": []
+    },
+    {
+      "url": "https://hh.ru/vacancy/117524640",
+      "title": "Middle Frontend Developer",
+      "salary": "От 180000 -  До – RUR",
+      "skills": []
+    },
+    {
+      "url": "https://hh.ru/vacancy/117454353",
+      "title": "Frontend-разработчик (middle)",
+      "salary": "От 130000 -  До 170000 RUR",
+      "skills": []
+    }
+  ]
+}
