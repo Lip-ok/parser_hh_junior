@@ -78,10 +78,10 @@ app.get("/vacancies", (req, res) => {
     }
 });
 
-app.listen(PORT, () => {
-    console.log(`Сервер запущен на http://localhost:${PORT}`);
-    if (!fs.existsSync(FILE_PATH) || !fs.readFileSync(FILE_PATH, "utf8").trim()) {
-        console.log("Файл вакансий пуст, выполняем загрузку...");
-        fetchVacancies();
-    }
-});
+// app.listen(PORT, () => {
+//     console.log(`Сервер запущен на http://localhost:${PORT}`);
+//     if (!fs.existsSync(FILE_PATH) || !fs.readFileSync(FILE_PATH, "utf8").trim()) {
+//         console.log("Файл вакансий пуст, выполняем загрузку...");
+//         fetchVacancies();
+//     }
+// });
