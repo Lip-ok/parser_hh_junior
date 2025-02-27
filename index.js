@@ -41,8 +41,8 @@ async function fetchVacancies() {
     }
 }
 
-// Запуск обновления каждые 13 минут
-cron.schedule("*/13 * * * *", fetchVacancies);
+// Запуск обновления каждые 10 минут
+cron.schedule("*/10 * * * *", fetchVacancies);
 
 app.get("/vacancies", (req, res) => {
     try {
